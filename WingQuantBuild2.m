@@ -1,5 +1,13 @@
 %% Clear
 clear all; close all; clc;
+%% Loading
+run CoordinateArray.m %Manually curated coordinates
+WingIDS = imageDatastore('C:\Users\che7oz\Desktop\Wing Quant\Wing Images\','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
+%%
+
+
+
+
 %% Load Images
 WingFiles = dir('pwd\*.tif');
 for i=1:length(WingFiles);
