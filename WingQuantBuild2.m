@@ -2,7 +2,8 @@
 clear all; close all; clc;
 %% Loading
 run CoordinateArray.m %Manually curated coordinates
-WingIDS = imageDatastore('C:\Users\che7oz\Desktop\Wing Quant\Wing Images\','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
+CoordFields = fieldnames(CoordArray);
+WingIDS = imageDatastore('C:\Users\che7oz\Desktop\Wings_for_david_20171108current','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
 %% Load Images
 for i=1:length(WingIDS.Files);
 				WingI = readDatastoreImage(WingIDS.Files{i,1});
@@ -34,7 +35,7 @@ for i=1:length(WingIDS.Files);
 				bw3 = bwmorph(bw2, 'open', Inf);
 				bw4 = bwmorph(bw3, 'close', Inf);
 				bw5 = bwmorph(bw4, 'spur', Inf);
-				figure, imshow(bw5); title('Smoothened; Extraneous Objects Removed')
+% 				figure, imshow(bw5); title('Smoothened; Extraneous Objects Removed')
 				bw5 = uint8(bw5);
 %% Skeleton
 bw6 = bwmorph(bw5,'skel', Inf);
@@ -42,11 +43,11 @@ bw7 = bwmorph(bw6,'spur', 10);%Spur setting is manually adjusted
 se = strel('disk',1);
 bw7a = imdilate(bw7,se);
 % bw7 = bwmorph(bw7, 'thicken'); 
-figure, imshow(bw7); title('Skeleton')
+% figure, imshow(bw7); title('Skeleton')
 bw8 = bwmorph(bw7, 'branchpoints');
 asdf = regionprops(bw8,'all');
 centroids = cat(1, asdf.Centroid);
-imshow(bw7); hold on;
+figure, imshow(bw7); hold on;
 plot(centroids(:,1), centroids(:,2), 'g*')
 % hold off
 % bw8 = bwmorph(bw8, 'thicken', 3); %Discriminates against certain obj
@@ -58,4 +59,69 @@ centroids2 = cat(1, asdf2.Centroid);
 plot(centroids2(:,1), centroids2(:,2), 'b*')
 hold off
 bw9 = imdilate(bw9,se);
+%% Skeletal Overlay
+figure, 
+imshow(WingI1); title('Skeletal Overlay on Base Image');
+I = bw7a;
+J = bw8;
+K = bw9;
+red = cat(3, ones(size(WingI1)), zeros(size(WingI1)), zeros(size(WingI1))); 
+green = cat(3, zeros(size(WingI1)), ones(size(WingI1)), zeros(size(WingI1)));
+blue = cat(3, zeros(size(WingI1)), zeros(size(WingI1)), ones(size(WingI1)));
+hold on ;
+h = imshow(red); 
+set(h, 'AlphaData', I);
+j = imshow(green); 
+set(j, 'AlphaData', J);
+k = imshow(blue);
+set(k, 'AlphaData', K);
+hold off;
+%% Coordinate Array
+coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
+% 
+% 
+% s1 = WingIDS.Files{i,1}
+% s2 = 
+% 
+% 
+% 
+% strcmp()
+% 
+% 
+%  if isequal(WingIDS.Files{i,1},'x')
+% 	end
+	
+
+%% Path Length
+for c = 1:8
+figure, 
+% imshow(bw7);hold on
+% imshow(WingI1); hold on
+r1 = coord(c,1);
+c1 = coord(c,2);
+r2 = coord(c,3);
+c2 = coord(c,4);
+hold on
+plot(c1, r1, 'g*', 'MarkerSize', 15)
+plot(c2, r2, 'g*', 'MarkerSize', 15)
+hold off
+D1 = bwdistgeodesic(bw7, c1, r1, 'quasi-euclidean');
+D2 = bwdistgeodesic(bw7, c2, r2, 'quasi-euclidean');
+
+D = D1 + D2;
+D = round(D * 8) / 8;
+
+D(isnan(D)) = inf;
+skeleton_path = imregionalmin(D);
+P = imoverlay(WingI1, imdilate(skeleton_path, ones(3,3)), [1 0 0]);
+imshow(P, 'InitialMagnification', 200)
+hold on
+plot(c1, r1, 'g*', 'MarkerSize', 10)
+plot(c2, r2, 'g*', 'MarkerSize', 10)
+hold off
+
+path_length = D(skeleton_path);
+path_lengths(:,c) = path_length(1)
+end
+
 end
