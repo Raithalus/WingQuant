@@ -3,7 +3,7 @@ clear all; close all; clc;
 %% Loading
 run CoordinateArray.m %Manually curated coordinates
 CoordFields = fieldnames(CoordArray);
-WingIDS = imageDatastore('C:\Users\che7oz\Desktop\Wings_for_david_20171108current','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
+WingIDS = imageDatastore('C:\Users\che7oz\Desktop\WingDB','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
 %% Load Images
 for i=1:length(WingIDS.Files);
 				WingI = readDatastoreImage(WingIDS.Files{i,1});
@@ -16,7 +16,7 @@ for i=1:length(WingIDS.Files);
 %     figure, imshow(WingI); title('Complement')
     WingIthresh = graythresh(WingI);
     WingIthreshback(i,:) = WingIthresh(:);
-    bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.4); %Sensitivity setting is manually adjusted
+    bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.315); %Sensitivity setting is manually adjusted
 %     figure, imshow (bw); title('Binary Image'); %toggle1
     bw = bwmorph(bw, 'fill');
     [N,M] = bwlabel(bw,4);
@@ -78,6 +78,10 @@ set(k, 'AlphaData', K);
 hold off;
 %% Coordinate Array
 coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
+WingIDS
+
+
+
 % 
 % 
 % s1 = WingIDS.Files{i,1}
