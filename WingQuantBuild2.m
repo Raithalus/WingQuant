@@ -1,5 +1,7 @@
 %% Clear
 clear all; close all; clc;
+format longg;
+format compact;
 %% Loading
 run CoordinateArray.m %Manually curated coordinates
 CoordFields = fieldnames(CoordArray);
@@ -16,7 +18,20 @@ for i=1:length(WingIDS.Files);
 %     figure, imshow(WingI); title('Complement')
     WingIthresh = graythresh(WingI);
     WingIthreshback(i,:) = WingIthresh(:);
-    bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.315); %Sensitivity setting is manually adjusted
+				
+				
+				if ismember(i,36:45)==1
+								bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.4); %Sensitivity setting is manually adjusted
+				else
+								bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.315); %Sensitivity setting is manually adjusted
+				end
+				
+				
+				
+				
+				
+				
+				
 %     figure, imshow (bw); title('Binary Image'); %toggle1
     bw = bwmorph(bw, 'fill');
     [N,M] = bwlabel(bw,4);
@@ -78,7 +93,7 @@ set(k, 'AlphaData', K);
 hold off;
 %% Coordinate Array
 coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
-WingIDS
+% WingIDS
 
 
 
@@ -125,7 +140,7 @@ plot(c2, r2, 'g*', 'MarkerSize', 10)
 hold off
 
 path_length = D(skeleton_path);
-path_lengths(:,c) = path_length(1)
+path_lengths(i,c) = path_length(1);
 end
 
 end
