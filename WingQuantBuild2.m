@@ -18,19 +18,12 @@ for i=1:length(WingIDS.Files);
 %     figure, imshow(WingI); title('Complement')
     WingIthresh = graythresh(WingI);
     WingIthreshback(i,:) = WingIthresh(:);
-				
-				
+						
 				if ismember(i,36:45)==1
-								bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.4); %Sensitivity setting is manually adjusted
+								bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.4); %Sensitivity setting is manually adjusted; F Thresh is different
 				else
 								bw = imbinarize(WingI, 'Adaptive','ForegroundPolarity','bright','Sensitivity',0.315); %Sensitivity setting is manually adjusted
 				end
-				
-				
-				
-				
-				
-				
 				
 %     figure, imshow (bw); title('Binary Image'); %toggle1
     bw = bwmorph(bw, 'fill');
@@ -94,19 +87,9 @@ hold off;
 %% Coordinate Array
 coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
 % WingIDS
-
-
-
-% 
-% 
 % s1 = WingIDS.Files{i,1}
 % s2 = 
-% 
-% 
-% 
 % strcmp()
-% 
-% 
 %  if isequal(WingIDS.Files{i,1},'x')
 % 	end
 	
@@ -142,5 +125,68 @@ hold off
 path_length = D(skeleton_path);
 path_lengths(i,c) = path_length(1);
 end
+%% Vein Diameter: Veins 1-6
+% vbw = imread('C:\Users\che7oz\Desktop\Wings_for_david_20171108current\E\E4.png');
+% vbw = imcrop(vbw,[min(m0),min(n0),max(m0)-min(m0),max(n0)-min(n0)]);
+VeinWidth = zeros(8,2000);
+for c = 1:6
+r1 = coord(c,1);
+c1 = coord(c,2);
+r2 = coord(c,3);
+c2 = coord(c,4);
+D1 = bwdistgeodesic(bw7, c1, r1, 'quasi-euclidean');
+D2 = bwdistgeodesic(bw7, c2, r2, 'quasi-euclidean');
+D = D1 + D2;
+D = round(D * 8) / 8;
+D(isnan(D)) = inf;
+skeleton_path = imregionalmin(D);
+bw5 = bwmorph(bw4, 'spur', Inf);
+% bw5 = vbw;
+edtImage = 2 * bwdist(~bw5); %figure, imshow(edtImage);
+diameterImage = edtImage .* double(skeleton_path);
+figure, imshow(diameterImage); hold on; plot(c1, r1, '*r')
+perimDI = bwperim(diameterImage);
+traceDI = bwtraceboundary(diameterImage,[c1-1 r1-1], 'E', 8);
+
+
+% ysum = sum(diameterImage);
+% ysum = double(ysum(ysum>0));
+% figure, plot(ysum);
+% VeinWidth(c,1:length(ysum)) = ysum;
+end
+
+
+
+
+%% Vein Diameter: Veins ACV/PCV
+for c = 7:8
+r1 = coord(c,1);
+c1 = coord(c,2);
+r2 = coord(c,3);
+c2 = coord(c,4);
+D1 = bwdistgeodesic(bw7, c1, r1, 'quasi-euclidean');
+D2 = bwdistgeodesic(bw7, c2, r2, 'quasi-euclidean');
+D = D1 + D2;
+D = round(D * 8) / 8;
+D(isnan(D)) = inf;
+skeleton_path = imregionalmin(D);
+bw5 = bwmorph(bw4, 'spur', Inf);
+edtImage = 2 * bwdist(~bw5);
+diameterImage = edtImage .* double(skeleton_path);
+figure, imshow(diameterImage);
+% ysum = sum(diameterImage'); %addition is directoinal FIX ME
+% figure, plot(ysum)
+% ysum = ysum(ysum>0);
+% figure, plot(ysum);
+% VeinWidth(c,1:length(ysum)) = ysum;
+end
+% VeinWidth = VeinWidth';
+%%
+% vbw = imread('E:\Wings_for_david_20171108current\Wing Vein bw\E4.png');
+% vbw = im2bw(vbw);
+% bwt = double(~bw5);
+% bwt = bwdist(bwt);
+% figure, imshow(bwt,[]);
+% export_fig('BWDist.png')
 
 end
