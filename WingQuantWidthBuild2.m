@@ -48,9 +48,9 @@ for i=1:length(WingIDS.Files);
 %% Skeleton
 bw6 = bwmorph(bw5,'skel', Inf);
 bw7 = bwmorph(bw6,'spur', 10);%Spur setting is manually adjusted
-% se = strel('disk',1);
-% bw7a = imdilate(bw7,se);
-% % bw7 = bwmorph(bw7, 'thicken'); 
+se = strel('disk',1);
+bw7a = imdilate(bw7,se);
+bw7 = bwmorph(bw7, 'thicken'); 
 % % figure, imshow(bw7); title('Skeleton')
 % bw8 = bwmorph(bw7, 'branchpoints');
 % asdf = regionprops(bw8,'all');
