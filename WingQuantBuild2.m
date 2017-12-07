@@ -45,6 +45,8 @@ for i=1:length(WingIDS.Files);
 				bw5 = bwmorph(bw4, 'spur', Inf);
 % 				figure, imshow(bw5); title('Smoothened; Extraneous Objects Removed')
 				bw5 = uint8(bw5);
+				bwt = double(~bw5);
+				bwt = bwdist(bwt);
 %% Skeleton
 bw6 = bwmorph(bw5,'skel', Inf);
 bw7 = bwmorph(bw6,'spur', 10);%Spur setting is manually adjusted
@@ -56,7 +58,7 @@ bw8 = bwmorph(bw7, 'branchpoints');
 asdf = regionprops(bw8,'all');
 centroids = cat(1, asdf.Centroid);
 figure, imshow(bw7); hold on;
-plot(centroids(:,1), centroids(:,2), 'g*')
+plot(centroids(:,1), centroids(:,2), '.g', 'MarkerSize', 20)
 % hold off
 % bw8 = bwmorph(bw8, 'thicken', 3); %Discriminates against certain obj
 se = strel('disk',5);
@@ -64,7 +66,7 @@ bw8 = imdilate(bw8,se);
 bw9 = bwmorph(bw7, 'endpoints');
 asdf2 = regionprops(bw9,'all');
 centroids2 = cat(1, asdf2.Centroid);
-plot(centroids2(:,1), centroids2(:,2), 'b*')
+plot(centroids2(:,1), centroids2(:,2), '.b', 'MarkerSize', 20)
 hold off
 bw9 = imdilate(bw9,se);
 %% Skeletal Overlay
@@ -103,10 +105,10 @@ r1 = coord(c,1);
 c1 = coord(c,2);
 r2 = coord(c,3);
 c2 = coord(c,4);
-hold on
-plot(c1, r1, 'g*', 'MarkerSize', 15)
-plot(c2, r2, 'g*', 'MarkerSize', 15)
-hold off
+% hold on
+% plot(c1, r1, 'g*', 'MarkerSize', 15)
+% plot(c2, r2, 'g*', 'MarkerSize', 15)
+% hold off
 D1 = bwdistgeodesic(bw7, c1, r1, 'quasi-euclidean');
 D2 = bwdistgeodesic(bw7, c2, r2, 'quasi-euclidean');
 
@@ -118,8 +120,8 @@ skeleton_path = imregionalmin(D);
 P = imoverlay(WingI1, imdilate(skeleton_path, ones(3,3)), [1 0 0]);
 imshow(P, 'InitialMagnification', 200)
 hold on
-plot(c1, r1, 'g*', 'MarkerSize', 10)
-plot(c2, r2, 'g*', 'MarkerSize', 10)
+plot(c1, r1, '.g', 'MarkerSize', 20)
+plot(c2, r2, '.g', 'MarkerSize', 20)
 hold off
 
 path_length = D(skeleton_path);
@@ -144,20 +146,15 @@ bw5 = bwmorph(bw4, 'spur', Inf);
 % bw5 = vbw;
 edtImage = 2 * bwdist(~bw5); %figure, imshow(edtImage);
 diameterImage = edtImage .* double(skeleton_path);
-figure, imshow(diameterImage); hold on; plot(c1, r1, '*r')
+figure, imshow(bwt,[]); hold on; 
+j = imshow(green); 
+plot(c1, r1, '.r', 'MarkerSize', 20)
+plot(c2, r2, '.b', 'MarkerSize', 20)
+set(j, 'AlphaData', diameterImage);
 perimDI = bwperim(diameterImage);
-traceDI = bwtraceboundary(diameterImage,[c1-1 r1-1], 'E', 8);
-
-
-% ysum = sum(diameterImage);
-% ysum = double(ysum(ysum>0));
-% figure, plot(ysum);
-% VeinWidth(c,1:length(ysum)) = ysum;
+traceDI = bwtraceboundary(diameterImage,[c1 r1], 'E', 8);
+hold off;
 end
-
-
-
-
 %% Vein Diameter: Veins ACV/PCV
 for c = 7:8
 r1 = coord(c,1);
@@ -173,12 +170,13 @@ skeleton_path = imregionalmin(D);
 bw5 = bwmorph(bw4, 'spur', Inf);
 edtImage = 2 * bwdist(~bw5);
 diameterImage = edtImage .* double(skeleton_path);
-figure, imshow(diameterImage);
-% ysum = sum(diameterImage'); %addition is directoinal FIX ME
-% figure, plot(ysum)
-% ysum = ysum(ysum>0);
-% figure, plot(ysum);
-% VeinWidth(c,1:length(ysum)) = ysum;
+figure, imshow(bwt,[]); hold on; 
+j = imshow(green); 
+plot(c1, r1, '.r')
+plot(c2, r2, '.b')
+set(j, 'AlphaData', diameterImage);
+perimDI = bwperim(diameterImage);
+traceDI = bwtraceboundary(diameterImage,[c1 r1], 'E', 8);
 end
 % VeinWidth = VeinWidth';
 %%
@@ -190,3 +188,5 @@ end
 % export_fig('BWDist.png')
 
 end
+
+figure, imshow(diameterImage)
