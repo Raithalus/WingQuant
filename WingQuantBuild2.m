@@ -7,7 +7,7 @@ run CoordinateArray.m %Manually curated coordinates
 CoordFields = fieldnames(CoordArray);
 WingIDS = imageDatastore('C:\Users\che7oz\Desktop\WingDB','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
 %% Load Images
-for i=1:10%length(WingIDS.Files);
+for i=1:length(WingIDS.Files);
 				WingI = readDatastoreImage(WingIDS.Files{i,1});
     WingI = WingI(:,:,1);
     WingIraw = WingI;
@@ -57,8 +57,8 @@ bw7a = imdilate(bw7,se);
 bw8 = bwmorph(bw7, 'branchpoints');
 asdf = regionprops(bw8,'all');
 centroids = cat(1, asdf.Centroid);
-figure, imshow(bw7); hold on;
-plot(centroids(:,1), centroids(:,2), '.g', 'MarkerSize', 20)
+% figure, imshow(bw7); hold on;
+% plot(centroids(:,1), centroids(:,2), '.g', 'MarkerSize', 20)
 % hold off
 % bw8 = bwmorph(bw8, 'thicken', 3); %Discriminates against certain obj
 se = strel('disk',5);
@@ -66,8 +66,8 @@ bw8 = imdilate(bw8,se);
 bw9 = bwmorph(bw7, 'endpoints');
 asdf2 = regionprops(bw9,'all');
 centroids2 = cat(1, asdf2.Centroid);
-plot(centroids2(:,1), centroids2(:,2), '.b', 'MarkerSize', 20)
-hold off
+% plot(centroids2(:,1), centroids2(:,2), '.b', 'MarkerSize', 20)
+% hold off
 bw9 = imdilate(bw9,se);
 %% Skeletal Overlay
 % figure, 
@@ -87,7 +87,7 @@ green = cat(3, zeros(size(WingI1)), ones(size(WingI1)), zeros(size(WingI1)));
 % set(k, 'AlphaData', K);
 % hold off;
 %% Coordinate Array
-coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
+coord = CoordArray.(CoordFields{i}); %Gets ith coordinates from CoordArray
 % WingIDS
 % s1 = WingIDS.Files{i,1}
 % s2 = 
@@ -98,7 +98,7 @@ coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
 
 %% Path Length
 for c = 1:8
-figure, 
+% figure, 
 % imshow(bw7);hold on
 % imshow(WingI1); hold on
 r1 = coord(c,1);
@@ -118,11 +118,11 @@ D = round(D * 8) / 8;
 D(isnan(D)) = inf;
 skeleton_path = imregionalmin(D);
 P = imoverlay(WingI1, imdilate(skeleton_path, ones(3,3)), [1 0 0]);
-imshow(P, 'InitialMagnification', 200)
-hold on
-plot(c1, r1, '.g', 'MarkerSize', 20)
-plot(c2, r2, '.g', 'MarkerSize', 20)
-hold off
+% imshow(P, 'InitialMagnification', 200)
+% hold on
+% plot(c1, r1, '.g', 'MarkerSize', 20)
+% plot(c2, r2, '.g', 'MarkerSize', 20)
+% hold off
 
 path_length = D(skeleton_path);
 path_lengths(i,c) = path_length(1);
@@ -146,21 +146,313 @@ bw5 = bwmorph(bw4, 'spur', Inf);
 % bw5 = vbw;
 edtImage = 2 * bwdist(~bw5); %figure, imshow(edtImage);
 diameterImage = edtImage .* double(skeleton_path);
-figure, imshow(bwt,[]); hold on; 
-j = imshow(green); 
-plot(c1, r1, '.r', 'MarkerSize', 20)
-plot(c2, r2, '.b', 'MarkerSize', 20)
-set(j, 'AlphaData', diameterImage);
-hold off;
+% figure, imshow(bwt,[]); hold on; 
+% j = imshow(green); 
+% plot(c1, r1, '.r', 'MarkerSize', 20)
+% plot(c2, r2, '.b', 'MarkerSize', 20)
+% set(j, 'AlphaData', diameterImage);
+% hold off;
 perimDI = bwperim(diameterImage);
+[R, C] = find(perimDI, 1, 'first');
+traceDI{:,:,c,i}= bwtraceboundary(perimDI,[R C], 'E', 8);
 
-[R, C] = find(perimDI, 1, 'first')
+% figure, imshow(bwt,[]); hold on;
+k = traceDI{:,:,c,i}(1:round(length(traceDI{:,:,c,i})/2),2);
+j = traceDI{:,:,c,i}(1:round(length(traceDI{:,:,c,i})/2),1);
+ChosenPixels{:, c, i} = improfile(bwt, k, j);
 
 
 
-traceDI = bwtraceboundary(perimDI,[R C], 'E', 8);
 
+%%
+for i = 1:5
+L1max(i,:) = length(ChosenPixels{:,1,i})
+% L1max = max(L1max)
+% midrow(i,:) = ChosenPixels{:,1,i}(ceil(end/2), :)
+L1mid = 
+
+
+
+
+end
+
+
+%% Quick Fig
+
+figure,
+for i = 1:52
+plot(ChosenPixels{:,1,i}); hold on; title('AllL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AllL1','-png');
+
+figure,
+for i = 1:52
+plot(ChosenPixels{:,2,i}); hold on; title('AllL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AllL2','-png');
+
+figure,
+for i = 1:52
+plot(ChosenPixels{:,3,i}); hold on; title('AllL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AllL3','-png');
+figure,
+for i = 1:52
+plot(ChosenPixels{:,4,i}); hold on; title('AllL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AllL4','-png');
+figure,
+for i = 1:52
+plot(ChosenPixels{:,5,i}); hold on; title('AllL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AllL5','-png');
+%% Quick Fig A
+figure,
+for i = 1:5
+plot(ChosenPixels{:,1,i}); hold on; title('AL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AL1','-png');
+
+figure,
+for i = 1:5
+plot(ChosenPixels{:,2,i}); hold on; title('AL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AL2','-png');
+
+figure,
+for i = 1:5
+plot(ChosenPixels{:,3,i}); hold on; title('AL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AL3','-png');
+
+figure,
+for i = 1:5
+plot(ChosenPixels{:,4,i}); hold on; title('AL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AL4','-png');
+
+figure,
+for i = 1:5
+plot(ChosenPixels{:,5,i}); hold on; title('AL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\AL5','-png');
+%% Quick Fig B
+figure,
+for i = 6:12
+plot(ChosenPixels{:,1,i}); hold on; title('BL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\BL1','-png');
+
+figure,
+for i = 6:12
+plot(ChosenPixels{:,2,i}); hold on; title('BL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\BL2','-png');
+
+figure,
+for i = 6:12
+plot(ChosenPixels{:,3,i}); hold on; title('BL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\BL3','-png');
+
+figure,
+for i = 6:12
+plot(ChosenPixels{:,4,i}); hold on; title('BL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\BL4','-png');
+
+figure,
+for i = 6:12
+plot(ChosenPixels{:,5,i}); hold on; title('BL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\BL5','-png');
+%% Quick Fig C
+figure,
+for i = 13:24
+plot(ChosenPixels{:,1,i}); hold on; title('CL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\CL1','-png');
+
+figure,
+for i = 13:24
+plot(ChosenPixels{:,2,i}); hold on; title('CL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\CL2','-png');
+
+figure,
+for i = 13:24
+plot(ChosenPixels{:,3,i}); hold on; title('CL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\CL3','-png');
+
+figure,
+for i = 13:24
+plot(ChosenPixels{:,4,i}); hold on; title('CL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\CL4','-png');
+
+figure,
+for i = 13:24
+plot(ChosenPixels{:,5,i}); hold on; title('CL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\CL5','-png');
+%% Quick Fig D
+figure,
+for i = 25:31
+plot(ChosenPixels{:,1,i}); hold on; title('DL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\DL1','-png');
+
+figure,
+for i = 25:31
+plot(ChosenPixels{:,2,i}); hold on; title('DL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\DL2','-png');
+
+figure,
+for i = 25:31
+plot(ChosenPixels{:,3,i}); hold on; title('DL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\DL3','-png');
+
+figure,
+for i = 25:31
+plot(ChosenPixels{:,4,i}); hold on; title('DL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\DL4','-png');
+
+figure,
+for i = 25:31
+plot(ChosenPixels{:,5,i}); hold on; title('DL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\DL5','-png');
+%% Quick Fig E
+figure,
+for i = 32:35
+plot(ChosenPixels{:,1,i}); hold on; title('EL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\EL1','-png');
+
+figure,
+for i = 32:35
+plot(ChosenPixels{:,2,i}); hold on; title('EL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\EL2','-png');
+
+figure,
+for i = 32:35
+plot(ChosenPixels{:,3,i}); hold on; title('EL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\EL3','-png');
+
+figure,
+for i = 32:35
+plot(ChosenPixels{:,4,i}); hold on; title('EL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\EL4','-png');
+
+figure,
+for i = 32:35
+plot(ChosenPixels{:,5,i}); hold on; title('EL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\EL5','-png');
+%% Quick Fig F
+figure,
+for i = 36:45
+plot(ChosenPixels{:,1,i}); hold on; title('FL1');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\FL1','-png');
+
+figure,
+for i = 36:45
+plot(ChosenPixels{:,2,i}); hold on; title('FL2');
+end
+xlim([1, 1100])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\FL2','-png');
+
+figure,
+for i = 36:45
+plot(ChosenPixels{:,3,i}); hold on; title('FL3');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\FL3','-png');
+
+figure,
+for i = 36:45
+plot(ChosenPixels{:,4,i}); hold on; title('FL4');
+end
+xlim([1, 1500])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\FL4','-png');
+
+figure,
+for i = 36:45
+plot(ChosenPixels{:,5,i}); hold on; title('FL5');
+end
+xlim([1, 800])
+export_fig('C:\Users\che7oz\Desktop\TempFigs\FL5','-png');
+%%
+% %% Quick Fig G (missing data)
+% figure,
+% for i = 46:52
+% plot(ChosenPixels{:,1,i}); hold on; title('GL1');
+% end
+% xlim([1, 1100])
 % 
+% figure,
+% for i = 46:52
+% plot(ChosenPixels{:,2,i}); hold on; title('GL2');
+% end
+% xlim([1, 1100])
+% 
+% figure,
+% for i = 46:52
+% plot(ChosenPixels{:,3,i}); hold on; title('GL3');
+% end
+% xlim([1, 1500])
+% 
+% figure,
+% for i = 46:52
+% plot(ChosenPixels{:,4,i}); hold on; title('GL4');
+% end
+% xlim([1, 1500])
+% 
+% figure,
+% for i = 46:52
+% plot(ChosenPixels{:,5,i}); hold on; title('GL5');
+% end
+% xlim([1, 800])
+%% 
 % I = perimDI
 % figure,
 % imshow(I)
@@ -220,17 +512,17 @@ end
 
 
 %%  Example Works
-I = perimDI
-figure,
-imshow(I)
-[r, c] = find(I, 1, 'first');
-mycontour = bwtraceboundary(I, [r c] ,'E',8,Inf,'counterclockwise') ;
-figure,
-imshow(bwt,[])
-% export_fig bwdistex.png
-hold on;
-plot(mycontour(:,2),mycontour(:,1),'g','LineWidth',1);
-i = mycontour(1:round(length(mycontour)/2),2);
-j = mycontour(1:round(length(mycontour)/2),1);
-ChosenPixels(:,:) = improfile(bwt, i, j)
-figure, plot(ChosenPixels)
+% I = perimDI
+% figure,
+% imshow(I)
+% [r, c] = find(I, 1, 'first');
+% mycontour = bwtraceboundary(I, [r c] ,'E',8,Inf,'counterclockwise') ;
+% figure,
+% imshow(bwt,[])
+% % export_fig bwdistex.png
+% hold on;
+% plot(mycontour(:,2),mycontour(:,1),'g','LineWidth',1);
+% i = mycontour(1:round(length(mycontour)/2),2);
+% j = mycontour(1:round(length(mycontour)/2),1);
+% ChosenPixels(:,:) = improfile(bwt, i, j)
+% figure, plot(ChosenPixels)
