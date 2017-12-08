@@ -7,7 +7,7 @@ run CoordinateArray.m %Manually curated coordinates
 CoordFields = fieldnames(CoordArray);
 WingIDS = imageDatastore('C:\Users\che7oz\Desktop\WingDB','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1)
 %% Load Images
-for i=1:length(WingIDS.Files);
+for i=1:10%length(WingIDS.Files);
 				WingI = readDatastoreImage(WingIDS.Files{i,1});
     WingI = WingI(:,:,1);
     WingIraw = WingI;
@@ -70,22 +70,22 @@ plot(centroids2(:,1), centroids2(:,2), '.b', 'MarkerSize', 20)
 hold off
 bw9 = imdilate(bw9,se);
 %% Skeletal Overlay
-figure, 
-imshow(WingI1); title('Skeletal Overlay on Base Image');
-I = bw7a;
-J = bw8;
-K = bw9;
-red = cat(3, ones(size(WingI1)), zeros(size(WingI1)), zeros(size(WingI1))); 
+% figure, 
+% imshow(WingI1); title('Skeletal Overlay on Base Image');
+% I = bw7a;
+% J = bw8;
+% K = bw9;
+% red = cat(3, ones(size(WingI1)), zeros(size(WingI1)), zeros(size(WingI1))); 
 green = cat(3, zeros(size(WingI1)), ones(size(WingI1)), zeros(size(WingI1)));
-blue = cat(3, zeros(size(WingI1)), zeros(size(WingI1)), ones(size(WingI1)));
-hold on ;
-h = imshow(red); 
-set(h, 'AlphaData', I);
-j = imshow(green); 
-set(j, 'AlphaData', J);
-k = imshow(blue);
-set(k, 'AlphaData', K);
-hold off;
+% blue = cat(3, zeros(size(WingI1)), zeros(size(WingI1)), ones(size(WingI1)));
+% hold on ;
+% h = imshow(red); 
+% set(h, 'AlphaData', I);
+% j = imshow(green); 
+% set(j, 'AlphaData', J);
+% k = imshow(blue);
+% set(k, 'AlphaData', K);
+% hold off;
 %% Coordinate Array
 coord = CoordArray.(CoordFields{i}) %Gets ith coordinates from CoordArray
 % WingIDS
@@ -151,34 +151,61 @@ j = imshow(green);
 plot(c1, r1, '.r', 'MarkerSize', 20)
 plot(c2, r2, '.b', 'MarkerSize', 20)
 set(j, 'AlphaData', diameterImage);
-perimDI = bwperim(diameterImage);
-traceDI = bwtraceboundary(diameterImage,[c1 r1], 'E', 8);
 hold off;
+perimDI = bwperim(diameterImage);
+
+[R, C] = find(perimDI, 1, 'first')
+
+
+
+traceDI = bwtraceboundary(perimDI,[R C], 'E', 8);
+
+% 
+% I = perimDI
+% figure,
+% imshow(I)
+% [d, b] = find(I, 1, 'first');
+% mycontour = bwtraceboundary(I, [d b] ,'E',8,Inf,'counterclockwise') ;I = perimDI
+% figure,
+% imshow(I)
+% [r, d] = find(I, 1, 'first');
+% mycontour = bwtraceboundary(I, [r d] ,'E',8,Inf,'counterclockwise') ;
+% figure,
+% imshow(bwt,[])
+% % export_fig bwdistex.png
+% hold on;
+% plot(mycontour(:,2),mycontour(:,1),'g','LineWidth',1);
+% k = mycontour(1:round(length(mycontour)/2),2);
+% j = mycontour(1:round(length(mycontour)/2),1);
+% ChosenPixels(:,:,c,i) = improfile(bwt, k, j)
+% figure, plot(ChosenPixels)
+
 end
 %% Vein Diameter: Veins ACV/PCV
-for c = 7:8
-r1 = coord(c,1);
-c1 = coord(c,2);
-r2 = coord(c,3);
-c2 = coord(c,4);
-D1 = bwdistgeodesic(bw7, c1, r1, 'quasi-euclidean');
-D2 = bwdistgeodesic(bw7, c2, r2, 'quasi-euclidean');
-D = D1 + D2;
-D = round(D * 8) / 8;
-D(isnan(D)) = inf;
-skeleton_path = imregionalmin(D);
-bw5 = bwmorph(bw4, 'spur', Inf);
-edtImage = 2 * bwdist(~bw5);
-diameterImage = edtImage .* double(skeleton_path);
-figure, imshow(bwt,[]); hold on; 
-j = imshow(green); 
-plot(c1, r1, '.r')
-plot(c2, r2, '.b')
-set(j, 'AlphaData', diameterImage);
-perimDI = bwperim(diameterImage);
-traceDI = bwtraceboundary(diameterImage,[c1 r1], 'E', 8);
+% for c = 7:8
+% r1 = coord(c,1);
+% c1 = coord(c,2);
+% r2 = coord(c,3);
+% c2 = coord(c,4);
+% D1 = bwdistgeodesic(bw7, c1, r1, 'quasi-euclidean');
+% D2 = bwdistgeodesic(bw7, c2, r2, 'quasi-euclidean');
+% D = D1 + D2;
+% D = round(D * 8) / 8;
+% D(isnan(D)) = inf;
+% skeleton_path = imregionalmin(D);
+% bw5 = bwmorph(bw4, 'spur', Inf);
+% edtImage = 2 * bwdist(~bw5);
+% diameterImage = edtImage .* double(skeleton_path);
+% figure, imshow(bwt,[]); hold on; 
+% j = imshow(green); 
+% plot(c1, r1, '.r')
+% plot(c2, r2, '.b')
+% set(j, 'AlphaData', diameterImage);
+% perimDI = bwperim(diameterImage);
+% [r, c] = find(perimDI, 1, 'first');
+% traceDI = bwtraceboundary(perimDI,[c r], 'S', 8,Inf,'counterclockwise');
+% plot(traceDI(:,2),traceDI(:,1),'g','LineWidth',1);
 end
-% VeinWidth = VeinWidth';
 %%
 % vbw = imread('E:\Wings_for_david_20171108current\Wing Vein bw\E4.png');
 % vbw = im2bw(vbw);
@@ -187,6 +214,23 @@ end
 % figure, imshow(bwt,[]);
 % export_fig('BWDist.png')
 
-end
+% end
+%%
+% figure, imshow(diameterImage);hold on; scatter(c1, r1,'*r')
 
-figure, imshow(diameterImage)
+
+%%  Example Works
+I = perimDI
+figure,
+imshow(I)
+[r, c] = find(I, 1, 'first');
+mycontour = bwtraceboundary(I, [r c] ,'E',8,Inf,'counterclockwise') ;
+figure,
+imshow(bwt,[])
+% export_fig bwdistex.png
+hold on;
+plot(mycontour(:,2),mycontour(:,1),'g','LineWidth',1);
+i = mycontour(1:round(length(mycontour)/2),2);
+j = mycontour(1:round(length(mycontour)/2),1);
+ChosenPixels(:,:) = improfile(bwt, i, j)
+figure, plot(ChosenPixels)
