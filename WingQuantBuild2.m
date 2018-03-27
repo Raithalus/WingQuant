@@ -43,7 +43,7 @@ for i=1:length(WingIDS.Files);
 				bw3 = bwmorph(bw2, 'open', Inf);
 				bw4 = bwmorph(bw3, 'close', Inf);
 				bw5 = bwmorph(bw4, 'spur', Inf);
-% 				figure, imshow(bw5); title('Smoothened; Extraneous Objects Removed')
+				figure, imshow(bw5); title('Smoothened; Extraneous Objects Removed')
 				bw5 = uint8(bw5);
 				bwt = double(~bw5);
 				bwt = bwdist(bwt);
@@ -52,22 +52,22 @@ bw6 = bwmorph(bw5,'skel', Inf);
 bw7 = bwmorph(bw6,'spur', 10);%Spur setting is manually adjusted
 se = strel('disk',1);
 bw7a = imdilate(bw7,se);
-% bw7 = bwmorph(bw7, 'thicken'); 
-% figure, imshow(bw7); title('Skeleton')
+bw7 = bwmorph(bw7, 'thicken'); 
+figure, imshow(bw7); title('Skeleton')
 bw8 = bwmorph(bw7, 'branchpoints');
 asdf = regionprops(bw8,'all');
 centroids = cat(1, asdf.Centroid);
-% figure, imshow(bw7); hold on;
-% plot(centroids(:,1), centroids(:,2), '.g', 'MarkerSize', 20)
-% hold off
-% bw8 = bwmorph(bw8, 'thicken', 3); %Discriminates against certain obj
+figure, imshow(bw7); hold on;
+plot(centroids(:,1), centroids(:,2), '.g', 'MarkerSize', 20)
+hold off
+bw8 = bwmorph(bw8, 'thicken', 3); %Discriminates against certain obj
 se = strel('disk',5);
 bw8 = imdilate(bw8,se);
 bw9 = bwmorph(bw7, 'endpoints');
 asdf2 = regionprops(bw9,'all');
 centroids2 = cat(1, asdf2.Centroid);
-% plot(centroids2(:,1), centroids2(:,2), '.b', 'MarkerSize', 20)
-% hold off
+plot(centroids2(:,1), centroids2(:,2), '.b', 'MarkerSize', 20)
+hold off
 bw9 = imdilate(bw9,se);
 %% Skeletal Overlay
 % figure, 
@@ -164,17 +164,15 @@ ChosenPixels{:, c, i} = improfile(bwt, k, j);
 
 
 
-%%
-for i = 1:5
-L1max(i,:) = length(ChosenPixels{:,1,i})
+%% WIP Profile Alignment
+% for i = 1:10
+% L1max(i,1) = length(ChosenPixels{:,1,i})
 % L1max = max(L1max)
-% midrow(i,:) = ChosenPixels{:,1,i}(ceil(end/2), :)
-L1mid = 
-
-
-
-
-end
+% % midrow(i,:) = ChosenPixels{:,1,i}(ceil(end/2), :)
+% L1mid = floor(L1max/2)
+% 
+% 
+% end
 
 
 %% Quick Fig
