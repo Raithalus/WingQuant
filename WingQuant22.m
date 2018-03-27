@@ -45,11 +45,11 @@ AI = max(AH)+1:WingLabel.Count(35)+max(AH);
 
 
 %%
-AlphaNum = {char('A'); 'B'; 'C'; 'D'; 'E'; 'F'; 'G'; 'H'; 'I'; 'J'; 'K'; 'L'; 'M'; 'N'; 'O'; 'P'; 'Q'; 'R'; 'S'; 'T'; 'U'; 'V'; 'W'; 'X'; 'Y'; 'Z'; 'AA'; 'AB'; 'AC'; 'AD'; 'AE'; 'AF'; 'AG'; 'AH'; 'AI'};
+AlphaNum = {'A'; 'B'; 'C'; 'D'; 'E'; 'F'; 'G'; 'H'; 'I'; 'J'; 'K'; 'L'; 'M'; 'N'; 'O'; 'P'; 'Q'; 'R'; 'S'; 'T'; 'U'; 'V'; 'W'; 'X'; 'Y'; 'Z'; 'AA'; 'AB'; 'AC'; 'AD'; 'AE'; 'AF'; 'AG'; 'AH'; 'AI'};
 AlphaTest = table(AlphaNum)
 %%
-table
-WingLabel.AlphaNum = 1
+% table
+% WingLabel.AlphaNum = 1
 
 
 
@@ -57,7 +57,7 @@ WingLabel.AlphaNum = 1
 
 %% Read Images
 
-for i = G %1:length(WingIDS.Files) %1:length(WingIDS.Files)
+for i = A %1:length(WingIDS.Files) %1:length(WingIDS.Files)
 		[test, fileinfo]= readimage(WingIDS,i);
 		[filepath,name,ext] = fileparts(fileinfo.Filename);
 		name = [name, ext];
