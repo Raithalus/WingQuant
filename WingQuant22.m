@@ -46,7 +46,12 @@ AI = max(AH)+1:WingLabel.Count(35)+max(AH);
 
 %%
 AlphaNum = {'A'; 'B'; 'C'; 'D'; 'E'; 'F'; 'G'; 'H'; 'I'; 'J'; 'K'; 'L'; 'M'; 'N'; 'O'; 'P'; 'Q'; 'R'; 'S'; 'T'; 'U'; 'V'; 'W'; 'X'; 'Y'; 'Z'; 'AA'; 'AB'; 'AC'; 'AD'; 'AE'; 'AF'; 'AG'; 'AH'; 'AI'};
-AlphaTest = table(AlphaNum)
+AlphaTest = table(AlphaNum);
+AlphaNum2 = {A; B; C; D; E; F; G; H; I; J; K; L; M; N; O; P; Q; R; S; T; U; V; W; X; Y; Z; AA; AB; AC; AD; AE; AF; AG; AH; AI;};
+
+AlphaSort = [table(AlphaNum), table(AlphaNum2), WingLabel];
+
+
 %%
 % table
 % WingLabel.AlphaNum = 1
@@ -57,15 +62,15 @@ AlphaTest = table(AlphaNum)
 
 %% Read Images
 
-for i = A %1:length(WingIDS.Files) %1:length(WingIDS.Files)
+for i = 1:length(WingIDS.Files) %1:length(WingIDS.Files)
 		[test, fileinfo]= readimage(WingIDS,i);
 		[filepath,name,ext] = fileparts(fileinfo.Filename);
 		name = [name, ext];
 		img(:,:,i) = rgb2gray(readimage(WingIDS,i));	
  	img1 = imgaussfilt(img(:,:,i), 4);
   img2 = imcomplement(img1);
-  T = adaptthresh(img2,0.51,'ForegroundPolarity','Bright','NeighborhoodSize', 65, 'Statistic', 'Mean');
-bw = imbinarize(img2, T);
+  Ta = adaptthresh(img2,0.51,'ForegroundPolarity','Bright','NeighborhoodSize', 65, 'Statistic', 'Mean');
+bw = imbinarize(img2, Ta);
 % 		bw = imbinarize(img2, 'Adaptive', 'ForegroundPolarity', 'Bright', 'Sensitivity', 0.5);
 		bw1 = bwareaopen(bw, 1000);
 		bw2 = bwmorph(bw1, 'fill');
@@ -156,28 +161,29 @@ bwCA = [stats.ConvexArea];
 bwCA3 = bwCA4(1);
 bwCA5 = stats(bwCA3).ConvexImage;
 %% Skeletal Overlay
-figure, 
-% imshow(WingI1); title(name, 'Interpreter', 'none');
-imshow(bwCA5); title(name, 'Interpreter', 'none');
-I = bw7;
-J = bw8;
-K = bw9;
-red = cat(3, ones(size(WingI1)), zeros(size(WingI1)), zeros(size(WingI1))); 
-green = cat(3, zeros(size(WingI1)), ones(size(WingI1)), zeros(size(WingI1)));
-blue = cat(3, zeros(size(WingI1)), zeros(size(WingI1)), ones(size(WingI1)));
-hold on ;
-h = imshow(red); 
-set(h, 'AlphaData', I);
-j = imshow(green); 
-set(j, 'AlphaData', J);
-k = imshow(blue);
-set(k, 'AlphaData', K);
-hold off;
+% figure, 
+% % imshow(WingI1); title(name, 'Interpreter', 'none');
+% imshow(bwCA5); title(name, 'Interpreter', 'none');
+% Ia = bw7;
+% Ja = bw8;
+% Ka = bw9;
+% red = cat(3, ones(size(WingI1)), zeros(size(WingI1)), zeros(size(WingI1))); 
+% green = cat(3, zeros(size(WingI1)), ones(size(WingI1)), zeros(size(WingI1)));
+% blue = cat(3, zeros(size(WingI1)), zeros(size(WingI1)), ones(size(WingI1)));
+% hold on ;
+% h = imshow(red); 
+% set(h, 'AlphaData', Ia);
+% j = imshow(green); 
+% set(j, 'AlphaData', Ja);
+% k = imshow(blue);
+% set(k, 'AlphaData', Ka);
+% hold off;
 %% Step Clear
 clear img1
 clear img2
 clear bw
 clear bw1
+i/length(WingIDS.Files)
 end
 
 %%
@@ -406,15 +412,15 @@ end
 % WingAreaStd(34,1) = std(WingConvexArea(AH));
 % WingAreaStd(35,1) = std(WingConvexArea(AI));
 % 
-WingAreaMean = table(WingAreaMean);
-WingAreaStd = table(WingAreaStd);
-WingTable = [WingTable WingAreaMean WingAreaStd];
-
-figure,
-for i = 1:length(WingIDS.Files)
-scatter(bw16{1,i}(:,1), bw16{1,i}(:,2), '.'); hold on;
-end
-set(gca, 'YDir', 'reverse')
+% WingAreaMean = table(WingAreaMean);
+% WingAreaStd = table(WingAreaStd);
+% WingTable = [WingTable WingAreaMean WingAreaStd];
+% 
+% figure,
+% for i = 1:length(WingIDS.Files)
+% scatter(bw16{1,i}(:,1), bw16{1,i}(:,2), '.'); hold on;
+% end
+% set(gca, 'YDir', 'reverse')
 
 
 % %% Procrustes
