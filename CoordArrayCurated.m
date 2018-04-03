@@ -1,4 +1,4 @@
-clear all; close all; clc; %clear
+% clear all; close all; clc; %clear
 %% Coordinate Array A (CoordArray.A1(r1,c1))
 
 CoordArray.A1 = [

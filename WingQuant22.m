@@ -3,7 +3,7 @@
 %% 
 run CoordArrayCurated.m
 %%
-WingIDS = imageDatastore('C:\Users\che7oz\Desktop\Wing DB Curated','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1);
+WingIDS = imageDatastore('C:\Users\David Cheung\Desktop\Wing DB Curated','FileExtensions','.tif', 'LabelSource', 'foldernames','IncludeSubfolders', 1);
 %% Label Count
 WingLabel = countEachLabel(WingIDS);
 A = 1:WingLabel.Count(1);
