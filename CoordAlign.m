@@ -1,6 +1,6 @@
 
 for i = 1:459
-CoordCheck(i,:) = length(intersect(bw16{1,i}, CoordArray.B2(:,:)));
+CoordCheck(i,:) = length(intersect(bw16{1,i}, CoordArray.Q4(:,:)));
 end
 
 figure,
